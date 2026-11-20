@@ -298,6 +298,8 @@
       tiles = tempTiles;
     }
 
+    let currentBoardWidth = 480;
+
     function drawBoard() {
       const board = document.getElementById('board');
       board.innerHTML = '';
@@ -309,7 +311,12 @@
         const positions = sorted.map(tile => tile.x * stepX + tile.z * DEPTH);
         const leftEdge = Math.min(...positions) - DEPTH;
         const rightEdge = Math.max(...positions) + TILE_W;
-        offsetX = Math.floor((480 - (rightEdge - leftEdge)) / 2 - leftEdge);
+
+        currentBoardWidth = Math.max(460, rightEdge - leftEdge + 24);
+        board.style.width = currentBoardWidth + 'px';
+        board.style.flex = `0 0 ${currentBoardWidth}px`;
+
+        offsetX = Math.floor((currentBoardWidth - (rightEdge - leftEdge)) / 2 - leftEdge);
       }
       for (const tile of sorted) {
         if (!tile.active) continue;
@@ -329,7 +336,9 @@
         button.addEventListener('click', () => onTileClick(tile));
         board.appendChild(button);
       }
+      if (typeof scaleBoard === 'function') scaleBoard();
     }
+
 
     function onTileClick(tile) {
       if (!isFree(tile)) return;
@@ -427,7 +436,7 @@
       const topBar = document.querySelector('.top-bar');
       const availableWidth = window.innerWidth - 8;
       const availableHeight = window.innerHeight - topBar.offsetHeight - 22;
-      const scale = Math.min(availableWidth / 480, availableHeight / 620, 1.1);
+      const scale = Math.min(availableWidth / currentBoardWidth, availableHeight / 620, 1.1);
       wrapper.style.transform = `scale(${Math.max(0.25, scale)})`;
     }
     window.addEventListener('resize', scaleBoard);
